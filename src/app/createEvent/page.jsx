@@ -14,7 +14,6 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import GreenLine from "@/components/utils/greenLine";
 
 export default function CriarEvento() {
@@ -223,6 +222,7 @@ export default function CriarEvento() {
                     id="number"
                     type="number"
                     placeholder="123"
+                    maskOptions="000000"
                     label="Número:"
                     value={eventForm.number}
                     onChange={(e) => handleChangeEventForm("number", e.target.value)}
@@ -231,8 +231,9 @@ export default function CriarEvento() {
                   />
                   <Input
                     id="cep"
-                    type="number"
+                    type="text"
                     placeholder="00000-000"
+                    maskOptions="00000-000"
                     label="CEP:"
                     value={eventForm.cep}
                     onChange={(e) => handleChangeEventForm("cep", e.target.value)}
