@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react"; // ícones (instale com: npm install lucide-react)
+import { Menu, X } from "lucide-react";
 
 export default function Header() {
     const [active, setActive] = useState("inicio");
@@ -23,11 +23,12 @@ export default function Header() {
                         src="https://s3-alpha-sig.figma.com/img/e3f2/d744/43123e918c90887cd4342e5a9c3f7e67?Expires=1745798400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=XH-BSJJcO2lcHvNZHWcNyj78hVGgVx69c61CvYQdJMg4v6IAqDYbpny3IuWhOvZ7vHan1zapenLPiT4oAgM2YhJUBEg1kNq056qYVAVTXdhP1Jt6WDoPzZ2utK3n47gW-DAnKk1a3ebfFWpKs7xre4ygxOMajU0kEsmAAK8qJ9DIPW9W4~QHvhrVd-Z5IqLqFbsrtnTeI38K1faxKBGXbCg7k9GmqDjI6Kkz1PhmtZD09wENBTtFugVA2Ne05pOuS9aRUQAZ89A0483DbU5wA0IBZUzrY-rbyo9geG9F2Fsvv2-ObQfwv1ZXw4d~Shiwms-fCpztMCwPvDBpgUU4yQ__"
                         alt="IFSP Cubatão"
                         className="h-24 invert brightness-0 object-contain"
+                        /*TODO: GET THE CHANGED LOGO */
                     />
                 </div>
 
                 {/* Menu - Desktop */}
-                <nav className="flex gap-10 h-[49px] items-center">
+                <nav className="hidden md:flex gap-10 h-[49px] items-center">
                     {navItems.map((item) => (
                         <button
                         key={item.key}
@@ -44,12 +45,12 @@ export default function Header() {
                     ))}
                 </nav>
 
-                {/* Ações - Desktop */}
+                {/* Login/Logout/Profile - Desktop */}
                 <div className="hidden md:block">
                     <IsLoggedIn isLoggedIn={false} />
                 </div>
 
-                {/* Botão Hamburguer - Mobile */}
+                {/* Hamburguer Menu - Mobile */}
                 <button
                     className="md:hidden text-white"
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -58,9 +59,9 @@ export default function Header() {
                 </button>
             </div>
 
-            {/* Menu Mobile */}
+            {/* Menu items Mobile */}
             {menuOpen && (
-                <div className="md:hidden bg-[#034833] px-4 pb-4">
+                <div className="md:hidden bg-[#034833] px-4 pb-4 border-t border-[#046E4A]">
                     <nav className="flex flex-col gap-4">
                         {navItems.map((item) => (
                             <button
@@ -95,6 +96,7 @@ export function IsLoggedIn({ isLoggedIn }) {
                         src="https://www.figma.com/design/M3AGbbfm2u25TKYwWHLR3A/Eventos-IFSP_CBT--Copy-?node-id=2028-531&t=maMTtzkKhbtWKlQp-4"
                         alt="Foto de perfil usuario"
                         className="h-10 w-10 rounded-full bg-gray-300"
+                        /*TODO: USE THE SVG */
                     />
                 </>
             ) : (
