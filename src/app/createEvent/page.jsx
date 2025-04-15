@@ -16,7 +16,12 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import GreenLine from "@/components/utils/greenLine";
 
+import { PlusCircle } from "lucide-react";
+
 export default function CriarEvento() {
+  // Trocar entre Formulário Eventos e Formulário Atividades
+  const [toggleForm, setToggleForm] = useState(false)
+
   // Valores default do Formulário de Eventos
   const [eventForm, setEventForm] = useState({
     type: "big",
@@ -51,13 +56,17 @@ export default function CriarEvento() {
     setEventForm((prevForm) => {
       const updatedEventForm = { ...prevForm, [field]: value}
       
-      const { uf, city, street, number, cep } = updatedEventForm;
-      updatedEventForm.location = `${street}, ${number} - ${city} - ${uf} - CEP: ${cep}`;
+      const { street, number, neighborhood, city, uf, cep } = updatedEventForm;
+      updatedEventForm.location = `${street}, ${number} - ${neighborhood}, ${city} - ${uf} - CEP: ${cep}`;
 
       return updatedEventForm;
     });
-    console.log(eventForm);
   };
+
+  // Envio dos 2 formulários. Evento e Atividades se houver.
+  const handleSubmitForm = (form) =>{
+    console.log(form);
+  }
 
   return (
     <div>
@@ -65,12 +74,12 @@ export default function CriarEvento() {
         <h1>Crie seu Evento!</h1>
       </div>
       <section className="flex flex-col items-center justify-center">
-        <div className="w-[90%] max-w-[1600px]">
+        <div className="w-[90%] max-w-[1600px] my-32">
           <GreenLine />
-
           <h2>Informações do Evento</h2>
-          <div className="w-full max-w-[1664px] bg-FI_form_bg p-16 border-FI_neutral_30 border-[1px] rounded-[10px]">
-            <form className="flex flex-col gap-8">
+          <div className="w-full max-w-[1664px] bg-FI_form_bg px-16 py-8 mb-8 border-FI_neutral_30 border rounded-md">
+            {}
+            <form id="Event" className="flex flex-col gap-8">
               <div className="w-full flex justify-between items-center">
                 <RadioGroup
                   id="eventType"
@@ -177,6 +186,47 @@ export default function CriarEvento() {
               </div>
               {(eventForm.format === "locally" || eventForm.format === "hybrid") && (
                 <div id="location" className="w-full flex flex-col justify-between items-center gap-10 md:flex-row">
+                  <Input
+                    id="street"
+                    type="text"
+                    placeholder="Rua Maria Cristina"
+                    label="Rua:"
+                    value={eventForm.street}
+                    onChange={(e) => handleChangeEventForm("street", e.target.value)}
+                    className="bg-FI_neutral_0 border-FI_input_stroke"
+                    width="w-full"
+                  />
+                  <Input
+                    id="number"
+                    type="number"
+                    placeholder="50"
+                    maskOptions="000000"
+                    label="Número:"
+                    value={eventForm.number}
+                    onChange={(e) => handleChangeEventForm("number", e.target.value)}
+                    className="bg-FI_neutral_0 border-FI_input_stroke"
+                    width="w-full md:w-1/2"
+                  />
+                  <Input
+                    id="neighborhood"
+                    type="text"
+                    placeholder="Jardim Casqueiro"
+                    label="Bairro:"
+                    value={eventForm.neighborhood}
+                    onChange={(e) => handleChangeEventForm("street", e.target.value)}
+                    className="bg-FI_neutral_0 border-FI_input_stroke"
+                    width="w-full"
+                  />
+                  <Input
+                    id="city"
+                    type="text"
+                    placeholder="Cubatão"
+                    label="Cidade:"
+                    value={eventForm.city}
+                    onChange={(e) => handleChangeEventForm("city", e.target.value)}
+                    className="bg-FI_neutral_0 border-FI_input_stroke"
+                    width="w-full"
+                  />
                   <Select onValueChange={(value) => handleChangeEventForm("uf", value)}>
                     <SelectTrigger
                       id="uf"
@@ -198,37 +248,6 @@ export default function CriarEvento() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Input
-                    id="city"
-                    type="text"
-                    placeholder="Cubatão"
-                    label="Cidade:"
-                    value={eventForm.city}
-                    onChange={(e) => handleChangeEventForm("city", e.target.value)}
-                    className="bg-FI_neutral_0 border-FI_input_stroke"
-                    width="w-full"
-                  />
-                  <Input
-                    id="street"
-                    type="text"
-                    placeholder="Rua Maria Cristina"
-                    label="Rua:"
-                    value={eventForm.street}
-                    onChange={(e) => handleChangeEventForm("street", e.target.value)}
-                    className="bg-FI_neutral_0 border-FI_input_stroke"
-                    width="w-full"
-                  />
-                  <Input
-                    id="number"
-                    type="number"
-                    placeholder="123"
-                    maskOptions="000000"
-                    label="Número:"
-                    value={eventForm.number}
-                    onChange={(e) => handleChangeEventForm("number", e.target.value)}
-                    className="bg-FI_neutral_0 border-FI_input_stroke"
-                    width="w-full md:w-1/2"
-                  />
                   <Input
                     id="cep"
                     type="text"
@@ -325,8 +344,21 @@ export default function CriarEvento() {
               <div>
                 <AddInput id="tags" label="Adicionar Tags:" placeholder="Tecnologia, Inteligência Artificial, Etc" label2="Tags:" value={eventForm.eventTags}  onChange={(value) => handleChangeEventForm("eventTags", value)}/>
               </div>
+              
+              {eventForm.type === "big" && (
+                <div>
+                  <div className="flex justify-center items-center gap-2 min-h-[60px] w-full rounded-md border px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-FI_neutral_0 border-FI_input_stroke h-64" >
+                    <PlusCircle size={40} className="text-FI_neutral_60"/>
+                    <p className="w-40 text-center text-FI_neutral_60">Ainda não há atividades neste evento.</p>
+                  </div> 
+                  <button className="mt-6 w-full bg-FI_neutral_60 hover:bg-FI_input_label text-white font-semibold py-2 rounded-md flex items-center justify-center gap-2 transition-colors">
+                    Adicionar Atividades
+                  </button>            
+                </div>
+              )}
             </form>
           </div>
+          <input type="button" value="Criar Evento" className="w-full bg-FI_green p-3 rounded-md text-white font-bold transition hover:bg-FI_green_dark cursor-pointer" />
         </div>
       </section>
     </div>
