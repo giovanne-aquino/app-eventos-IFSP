@@ -16,25 +16,25 @@ export default function AtividadeFormulario() {
   
   const onSubmit = (data) => {
     const atividade = {
-      Nome: data.Nome,
+      name: data.Nome,
       OrganizadorDoEvento: Number(data.OrganizadorDoEvento),
-      Descricao: data.Descricao,
-      Formato: data.Formato,
-      Local: data.Local,
-      DocumentoDoUser: data.DocumentoDoUser === 'on', // Checkbox
-      Banner: data.Banner?.[0] || null, // Arquivo selecionado
+      description: data.Descricao,
+      format: data.Formato,
+      location: data.Local,
+      userDocument: data.DocumentoDoUser === 'on', // Checkbox
+      banner: data.Banner?.[0] || null, // Arquivo selecionado
       Tags: data.Tags
         ? data.Tags.split(',').map((tag) => tag.trim()).filter((tag) => tag !== '')
         : [],
-      Periodo: {
-        dataInicio: data.DataInicio,
-        horaInicio: data.HoraInicio,
-      },
-      Tipo: data.Tipo,
-      CapacidadeMaxima: Number(data.CapacidadeMaxima),
-      HorasComplementares: Number(data.HorasComplementares),
-      EventoID: Number(data.EventoID),
+      startDate: data.DataInicio,
+      startTime: data.HoraInicio,
+      activityType: data.Tipo,
+      maxCapacity: Number(data.CapacidadeMaxima),
+      complementaryHours: Number(data.HorasComplementares),
+      eventId: Number(data.EventoID),
     };
+
+    console.log('Atividade criada:', atividade);
 
     setActivitiesList((prevActivities) => [...prevActivities, atividade]);
     reset();
@@ -252,16 +252,41 @@ export default function AtividadeFormulario() {
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Atividades Criadas</h2>
             <div className="grid grid-cols-1 gap-6">
-              {activitiesList.map((atividade, index) => (
+                            {activitiesList.map((atividade, index) => (
                 <div key={index} className="bg-white shadow-lg rounded-lg p-6">
-                  <h3 className="text-xl font-bold mb-2">{atividade.Nome}</h3>
-                  <p className="text-gray-700 mb-2">{atividade.Descricao}</p>
+                  <h3 className="text-xl font-bold mb-2">{atividade.name}</h3>
+                  <p className="text-gray-700 mb-2">{atividade.description}</p>
                   <p className="text-gray-600">
-                    <strong>Local:</strong> {atividade.Local}
+                    <strong>Local:</strong> {atividade.location}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Formato:</strong> {atividade.Formato}
+                    <strong>Formato:</strong> {atividade.format}
                   </p>
+                  <p className="text-gray-600">
+                    <strong>Data:</strong> {atividade.startDate}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Horário:</strong> {atividade.startTime}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Capacidade Máxima:</strong> {atividade.maxCapacity}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Horas Complementares:</strong> {atividade.complementaryHours}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Tags:</strong> {atividade.Tags.join(', ')}
+                  </p>
+                  {atividade.userDocument && (
+                    <p className="text-gray-600">
+                      <strong>Documento do Usuário:</strong> Solicitado
+                    </p>
+                  )}
+                  {atividade.banner && (
+                    <p className="text-gray-600">
+                      <strong>Banner:</strong> {atividade.banner.name}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
