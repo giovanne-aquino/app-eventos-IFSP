@@ -70,22 +70,39 @@ export default function AtividadeFormulario() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Formato*
-                </label>
-                <select
-                  {...register('Formato', { required: true })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="presencial">Presencial</option>
-                  <option value="online">Online</option>
-                  <option value="híbrido">Híbrido</option>
-                </select>
-                {errors.Formato && (
-                  <p className="mt-1 text-sm text-red-600">O formato é obrigatório.</p>
-                )}
-              </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Formato*
+                    </label>
+                    <select
+                      {...register('Formato', { required: true })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="PRESENTIAL">Presencial</option>
+                      <option value="ONLINE">Online</option>
+                      <option value="HYBRID">Híbrido</option>
+                    </select>
+                    {errors.Formato && (
+                      <p className="mt-1 text-sm text-red-600">O formato é obrigatório.</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo da atividade</label>
+                    <select 
+                      {...register('Tipo', { required: true })} 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="LECTURE">Palestra</option>
+                      <option value="SHORT_COURSE">Minicurso</option>
+                      <option value="WORKSHOP">Workshop</option>
+                    </select>
+                    {errors.Tipo && (
+                      <p className="mt-1 text-sm text-red-600">O tipo da atividade é obrigatório.</p>
+                    )}
+                  </div>
+                </div>
             </div>
 
             {/* Local e Data/Hora */}
@@ -247,51 +264,48 @@ export default function AtividadeFormulario() {
             </button>
           </div>
         </form>
-
-        {activitiesList.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Atividades Criadas</h2>
-            <div className="grid grid-cols-1 gap-6">
-                            {activitiesList.map((atividade, index) => (
-                <div key={index} className="bg-white shadow-lg rounded-lg p-6">
-                  <h3 className="text-xl font-bold mb-2">{atividade.name}</h3>
-                  <p className="text-gray-700 mb-2">{atividade.description}</p>
-                  <p className="text-gray-600">
-                    <strong>Local:</strong> {atividade.location}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Formato:</strong> {atividade.format}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Data:</strong> {atividade.startDate}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Horário:</strong> {atividade.startTime}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Capacidade Máxima:</strong> {atividade.maxCapacity}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Horas Complementares:</strong> {atividade.complementaryHours}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Tags:</strong> {atividade.Tags.join(', ')}
-                  </p>
-                  {atividade.userDocument && (
-                    <p className="text-gray-600">
-                      <strong>Documento do Usuário:</strong> Solicitado
-                    </p>
-                  )}
-                  {atividade.banner && (
-                    <p className="text-gray-600">
-                      <strong>Banner:</strong> {atividade.banner.name}
-                    </p>
-                  )}
-                </div>
-              ))}
+        
+        <div className="flex">
+          {activitiesList.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Atividades Criadas</h2>
+              <div className="grid grid-cols-2 gap-2">
+                {activitiesList.map((atividade, index) => (
+                  <div key={index} className="bg-white shadow-lg rounded-lg p-6">
+                    <h3 className="text-xl font-bold mb-2">{atividade.name}</h3>
+                    <p className="text-gray-700 mb-2">{atividade.description}</p>
+                    {/* pill buttons */}
+                    <div className="">
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full mr-2">
+                        {atividade.location}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
+                        {atividade.format === 'PRESENTIAL' ? 'Presencial' : atividade.format === 'ONLINE' ? 'Online' : 'Híbrido'}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full ml-2">
+                        {atividade.userDocument ? 'Solicitar Documento' : 'Não Solicitar Documento'}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full ml-2">
+                        {new Date(atividade.startDate).toLocaleDateString('pt-BR')} {atividade.startTime}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full ml-2">
+                        {atividade.maxCapacity}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full ml-2">
+                        {atividade.activityType === 'LECTURE' ? 'Palestra' : atividade.activityType === 'SHORT_COURSE' ? 'Minicurso' : 'Workshop'}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full ml-2">
+                        {atividade.complementaryHours}
+                      </span>
+                                
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        
       </div>
     </main>
   );
