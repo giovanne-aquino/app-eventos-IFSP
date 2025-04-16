@@ -1,14 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function AtividadeFormulario() {
+  const [activitiesList, setActivitiesList] = useState([]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    reset
   } = useForm();
   
   const onSubmit = (data) => {
@@ -33,7 +36,8 @@ export default function AtividadeFormulario() {
       EventoID: Number(data.EventoID),
     };
 
-    console.log('Objeto Atividade para envio:', atividade);
+    setActivitiesList((prevActivities) => [...prevActivities, atividade]);
+    reset();
   }
 
   const bannerFile = watch('Banner');
@@ -45,13 +49,16 @@ export default function AtividadeFormulario() {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white shadow rounded-lg overflow-hidden"
         >
+          {/* Todo o conteúdo do formulário */}
           <div className="p-6 sm:p-8">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Crie uma atividade</h1>
 
             {/* Nome e Formato */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da atividade*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nome da atividade*
+                </label>
                 <input
                   type="text"
                   {...register('Nome', { required: true })}
@@ -64,7 +71,9 @@ export default function AtividadeFormulario() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Formato*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Formato*
+                </label>
                 <select
                   {...register('Formato', { required: true })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -123,7 +132,9 @@ export default function AtividadeFormulario() {
             {/* Descrição e Upload */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descrição*
+                </label>
                 <textarea
                   {...register('Descricao', { required: true })}
                   placeholder="Digite aqui a descrição detalhada da atividade..."
@@ -136,7 +147,9 @@ export default function AtividadeFormulario() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Banner (opcional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Banner (opcional)
+                </label>
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                   <div className="space-y-1 text-center">
                     <div className="flex text-sm text-gray-600">
@@ -171,18 +184,24 @@ export default function AtividadeFormulario() {
             {/* Campos adicionais */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tags (opcional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tags (opcional)
+                </label>
                 <input
                   type="text"
                   {...register('Tags')}
                   placeholder="Ex: tecnologia, inovação, workshop"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="mt-1 text-xs text-gray-500">Separe as tags por vírgula</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Separe as tags por vírgula
+                </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Capacidade Máxima</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Capacidade Máxima
+                </label>
                 <input
                   type="number"
                   {...register('CapacidadeMaxima')}
@@ -194,7 +213,9 @@ export default function AtividadeFormulario() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Horas Complementares</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Horas Complementares
+                </label>
                 <input
                   type="number"
                   {...register('HorasComplementares')}
@@ -226,6 +247,26 @@ export default function AtividadeFormulario() {
             </button>
           </div>
         </form>
+
+        {activitiesList.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Atividades Criadas</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {activitiesList.map((atividade, index) => (
+                <div key={index} className="bg-white shadow-lg rounded-lg p-6">
+                  <h3 className="text-xl font-bold mb-2">{atividade.Nome}</h3>
+                  <p className="text-gray-700 mb-2">{atividade.Descricao}</p>
+                  <p className="text-gray-600">
+                    <strong>Local:</strong> {atividade.Local}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Formato:</strong> {atividade.Formato}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
