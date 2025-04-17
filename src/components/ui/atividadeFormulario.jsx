@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function AtividadeFormulario() {
   const [activitiesList, setActivitiesList] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState(null);
 
   const {
     register,
@@ -16,14 +17,23 @@ export default function AtividadeFormulario() {
     setValue,
   } = useForm();
 
+  const bannerFile = watch("Banner");
+  useEffect(() => {
+    if (bannerFile && bannerFile[0]) {
+      setBannerPreview(URL.createObjectURL(bannerFile[0]));
+    }
+  }, [bannerFile]);
+
   const onSubmit = (data) => {
+    const file = data.Banner?.[0] || null;
+
     const atividade = {
       name: data.Nome,
       description: data.Descricao,
       format: data.Formato,
       location: data.Local,
       userDocument: data.DocumentoDoUser === "on", // Checkbox
-      banner: data.Banner?.[0] || null, // Arquivo selecionado
+      banner: file, // Arquivo selecionado
       Tags: data.Tags
         ? data.Tags.split(",")
             .map((tag) => tag.trim())
@@ -48,6 +58,7 @@ export default function AtividadeFormulario() {
       setActivitiesList((prev) => [...prev, atividade]);
     }
     reset();
+    setBannerPreview(null);
   };
 
   const handleEdit = (index) => {
@@ -64,6 +75,14 @@ export default function AtividadeFormulario() {
     setValue("CapacidadeMaxima", at.maxCapacity);
     setValue("HorasComplementares", at.complementaryHours);
     setValue("EventoID", at.eventId);
+
+    setValue("Banner", []);
+    if (at.banner) {
+      setBannerPreview(URL.createObjectURL(at.banner));
+    } else {
+      setBannerPreview(null);
+    }
+
     setEditingIndex(index);
   };
 
@@ -75,8 +94,6 @@ export default function AtividadeFormulario() {
       setEditingIndex(null);
     }
   };
-
-  const bannerFile = watch("Banner");
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -248,10 +265,14 @@ export default function AtividadeFormulario() {
                     <p className="text-xs text-gray-500">
                       PNG, JPG, GIF até 5MB
                     </p>
-                    {bannerFile?.[0] && (
-                      <div className="mt-2 text-sm text-gray-900">
-                        Arquivo selecionado: {bannerFile[0].name}
-                      </div>
+
+                    {/* preview da imagem */}
+                    {bannerPreview && (
+                      <img
+                        src={bannerPreview}
+                        alt="Pré-visualização do banner"
+                        className="mt-4 max-h-40 rounded-md mx-auto"
+                      />
                     )}
                   </div>
                 </div>
