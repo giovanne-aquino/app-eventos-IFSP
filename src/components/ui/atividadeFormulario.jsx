@@ -99,6 +99,26 @@ export default function AtividadeFormulario() {
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        <button
+          //chama o useState aqui
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Voltar
+        </button>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white shadow rounded-lg overflow-hidden"
