@@ -11,7 +11,6 @@ const About = () => {
 </div>
 
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-4">Sobre o Projeto</h1>
         <p className="mb-4 text-gray-700">
           O <strong>App Eventos IFSP</strong> é uma aplicação web desenvolvida por estudantes do <strong>Instituto Federal de São Paulo – Campus Cubatão</strong> como parte da disciplina <strong>Extensão III</strong>, oferecida no curso superior de <strong>Tecnologia em Análise e Desenvolvimento de Sistemas (ADS)</strong>.
         </p>
