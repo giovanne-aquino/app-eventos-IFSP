@@ -1,5 +1,7 @@
 "use client";
 
+import getAllEvents from "../../../services/event";
+
 import { useState, useEffect } from "react";
 
 import { Input } from "@/components/ui/input";
@@ -65,14 +67,20 @@ export default function EventForm({ toggleForm, submitForm }) {
   };
 
   // Envio do Formulário
-  const handleSubmitForm = () => {
+  const handleSubmitForm = async () => {
+    try {
+      const events = await getAllEvents();
+      submitForm(events);
+    } catch (e) {
+      submitForm(e);
+    }
+
     // Só pode adicionar se o IsEventFormValid
 
     // Chamada da API para criar Evento
 
     // Retorna os dados do evento para a pagina pai.
-    console.log(eventForm);
-    submitForm(eventForm);
+    // console.log(eventForm);
   };
 
   return (
