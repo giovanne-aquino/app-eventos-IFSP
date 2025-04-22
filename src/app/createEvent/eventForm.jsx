@@ -25,7 +25,7 @@ export default function EventForm({ toggleForm, submitForm }) {
 
   // Valores default do Formulário de Eventos
   const [eventForm, setEventForm] = useState({
-    type: "big",
+    type: "LARGE",
     name: "",
     status: "",
     startDate: "",
@@ -82,11 +82,11 @@ export default function EventForm({ toggleForm, submitForm }) {
           <div className="w-full flex justify-between items-center">
             <RadioGroup
               id="eventType"
-              defaultValue="big"
+              defaultValue="LARGE"
               className="flex flex-col justify-between items-center gap-10 sm:flex-row"
               onValueChange={(value) => handleChangeEventForm("type", value)}
             >
-              <RadioGroupItem value="big" label="Evento Grande" />
+              <RadioGroupItem value="LARGE" label="Evento Grande" />
               <RadioGroupItem value="simple" label="Evento Simples" />
             </RadioGroup>
           </div>
@@ -118,7 +118,7 @@ export default function EventForm({ toggleForm, submitForm }) {
             </Select>
           </div>
           <div className="w-full flex flex-col justify-between items-center gap-10 md:flex-row">
-            {eventForm.type === "big" ? (
+            {eventForm.type === "LARGE" ? (
               <div className="w-full flex flex-col justify-between items-center gap-10 md:flex-row">
                 <Input
                   id="eventStartDate"
@@ -388,7 +388,7 @@ export default function EventForm({ toggleForm, submitForm }) {
             />
           </div>
 
-          {eventForm.type === "big" && (
+          {eventForm.type === "LARGE" && (
             <div>
               <div className="flex justify-center items-center gap-2 min-h-[60px] w-full rounded-md border px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-FI_neutral_0 border-FI_input_stroke h-64">
                 <PlusCircle size={40} className="text-FI_neutral_60" />

@@ -4,7 +4,7 @@ import { TimerReset } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-export default function AtividadeFormulario() {
+export default function AtividadeFormulario({ toggleForm, submitForm }) {
   const [activitiesList, setActivitiesList] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(null);
@@ -102,6 +102,7 @@ export default function AtividadeFormulario() {
         <button
           //chama o useState aqui
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-4"
+          onClick={toggleForm}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -209,27 +210,32 @@ export default function AtividadeFormulario() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data*
-                </label>
-                <input
-                  type="date"
-                  {...register("DataInicio", {
-                    required: "A data é obrigatória.",
-                    validate: (value) => {
-                      const today = new Date();
-                      const inputDate = new Date(value);
-                      today.setHours(0, 0, 0, 0); 
-                      return inputDate >= today || "A data não pode ser no passado.";
-                    },
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                {errors.DataInicio && (
-                  <p className="mt-1 text-sm text-red-600">{errors.DataInicio.message}</p>
-                )}
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Data*
+                  </label>
+                  <input
+                    type="date"
+                    {...register("DataInicio", {
+                      required: "A data é obrigatória.",
+                      validate: (value) => {
+                        const today = new Date();
+                        const inputDate = new Date(value);
+                        today.setHours(0, 0, 0, 0);
+                        return (
+                          inputDate >= today ||
+                          "A data não pode ser no passado."
+                        );
+                      },
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {errors.DataInicio && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.DataInicio.message}
+                    </p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Horário*
@@ -296,33 +302,32 @@ export default function AtividadeFormulario() {
                     {/* preview da imagem */}
                     {bannerPreview && (
                       <div className="relative mt-4 flex justify-center">
-                      <img
-                        src={bannerPreview}
-                        alt="Pré-visualização do banner"
-                        className="max-h-40 rounded-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setBannerPreview(null);
-                          setValue("Banner", null); // Clear the file input
-                        }}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:scale-110 transition-transform"
-                      >
-                        &times;
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setBannerPreview(null);
-                          setValue("Banner", null); // Clear the file input
-                        }}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:scale-110 transition-transform"
-                      >
-                        &times;
-                      </button>
-
-                    </div>                    
+                        <img
+                          src={bannerPreview}
+                          alt="Pré-visualização do banner"
+                          className="max-h-40 rounded-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBannerPreview(null);
+                            setValue("Banner", null); // Clear the file input
+                          }}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:scale-110 transition-transform"
+                        >
+                          &times;
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBannerPreview(null);
+                            setValue("Banner", null); // Clear the file input
+                          }}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:scale-110 transition-transform"
+                        >
+                          &times;
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import AtividadeFormulario from "@/components/ui/atividadeFormulario";
+import AtividadeFormulario from "@/app/createEvent/atividadeFormulario";
 
 export default function Home() {
   return (

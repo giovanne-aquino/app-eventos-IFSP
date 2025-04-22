@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 
 import EventForm from "./eventForm";
+import AtividadeFormulario from "./atividadeFormulario";
 
 import GreenLine from "@/components/utils/greenLine";
 
@@ -15,7 +16,12 @@ export default function CriarEvento() {
 
   // Obtendo dados do envio do evento.
   const handleSubmitEvent = (formData) => {
-    console.log("Page:");
+    console.log("Evento:");
+    console.log(formData);
+  };
+
+  const handleSubmitActivity = (formData) => {
+    console.log("Atividade:");
     console.log(formData);
   };
 
@@ -37,11 +43,11 @@ export default function CriarEvento() {
           <div>
             {/* Título do Formulário depende do ToggleForm para ser Evento ou Atividade. */}
             {toggleForm === true ? (
-              <h2 className="text-3xl text-FI_neutral-0 font-bold mb-8">
+              <h2 className="text-3xl text-FI_green_dark font-bold mb-8">
                 Informações do Evento
               </h2>
             ) : (
-              <h2 className="text-3xl text-FI_neutral-0 font-bold mb-8">
+              <h2 className="text-3xl text-FI_green_dark font-bold mb-8">
                 Informações da Atividade
               </h2>
             )}
@@ -55,6 +61,10 @@ export default function CriarEvento() {
             ) : (
               // Formulário de Atividades AQUI!
               <>
+                <AtividadeFormulario
+                  toggleForm={() => setToggleForm(!toggleForm)}
+                  submitForm={handleSubmitActivity}
+                />
                 <input
                   type="button"
                   onClick={() => setToggleForm(!toggleForm)}
