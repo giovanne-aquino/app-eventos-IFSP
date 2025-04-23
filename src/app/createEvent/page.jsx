@@ -53,26 +53,25 @@ export default function CriarEvento() {
             )}
 
             {/* Formulário Inicia com o de Eventos. */}
-            {toggleForm ? (
+            <div className={toggleForm ? "" : "hidden"}>
               <EventForm
                 toggleForm={() => setToggleForm(!toggleForm)}
                 submitForm={handleSubmitEvent}
               />
-            ) : (
-              // Formulário de Atividades AQUI!
-              <>
-                <AtividadeFormulario
-                  toggleForm={() => setToggleForm(!toggleForm)}
-                  submitForm={handleSubmitActivity}
-                />
-                <input
-                  type="button"
-                  onClick={() => setToggleForm(!toggleForm)}
-                  value="Voltar para Evento"
-                  className="mt-6 w-full bg-FI_neutral_60 hover:bg-FI_input_label text-white font-semibold py-2 rounded-md flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                />
-              </>
-            )}
+            </div>
+
+            <div className={toggleForm ? "hidden" : ""}>
+              <AtividadeFormulario
+                toggleForm={() => setToggleForm(!toggleForm)}
+                submitForm={handleSubmitActivity}
+              />
+              <input
+                type="button"
+                onClick={() => setToggleForm(!toggleForm)}
+                value="Voltar para Evento"
+                className="mt-6 w-full bg-FI_neutral_60 hover:bg-FI_input_label text-white font-semibold py-2 rounded-md flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              />
+            </div>
           </div>
         </div>
       </section>

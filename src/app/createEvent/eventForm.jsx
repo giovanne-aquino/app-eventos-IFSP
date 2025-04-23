@@ -1,6 +1,6 @@
 "use client";
 
-import getAllEvents from "../../../services/event";
+import { createEvent } from "../../../services/event";
 
 import { useState, useEffect } from "react";
 
@@ -30,18 +30,18 @@ export default function EventForm({ toggleForm, submitForm }) {
     type: "LARGE",
     name: "",
     status: "",
-    startDate: "",
-    endDate: "",
+    startDate: "2025-04-28T01:05:54.743Z",
+    endDate: "2025-04-29T01:05:54.743Z",
     format: "",
     location: "",
     description: "",
-    banner: "",
-    maxCapacity: "",
-    complementaryHours: "",
+    banner: "banner.png",
+    maxCapacity: 1,
+    complementaryHours: 1,
     fields: [],
     eventTags: [],
-    userDocument: "",
-    organizerId: "",
+    userDocument: "", // deve ser booleano
+    organizerId: 1,
     userOrganizer: "",
   });
   const [eventUserDocCheck, setEventUserDocCheck] = useState(false);
@@ -69,18 +69,27 @@ export default function EventForm({ toggleForm, submitForm }) {
   // Envio do Formulário
   const handleSubmitForm = async () => {
     try {
-      const events = await getAllEvents();
-      submitForm(events);
+      //if (isEventFormValid) {
+      const event = await createEvent(
+        eventForm.name,
+        eventForm.description,
+        1,
+        eventForm.format,
+        eventForm.location,
+        true,
+        "banner.png",
+        eventForm.type,
+        eventForm.startDate,
+        eventForm.endDate,
+        eventForm.maxCapacity,
+        eventForm.complementaryHours,
+        eventForm.status
+      );
+      submitForm(event.data);
+      //}
     } catch (e) {
       submitForm(e);
     }
-
-    // Só pode adicionar se o IsEventFormValid
-
-    // Chamada da API para criar Evento
-
-    // Retorna os dados do evento para a pagina pai.
-    // console.log(eventForm);
   };
 
   return (
@@ -95,7 +104,7 @@ export default function EventForm({ toggleForm, submitForm }) {
               onValueChange={(value) => handleChangeEventForm("type", value)}
             >
               <RadioGroupItem value="LARGE" label="Evento Grande" />
-              <RadioGroupItem value="simple" label="Evento Simples" />
+              <RadioGroupItem value="SIMPLE" label="Evento Simples" />
             </RadioGroup>
           </div>
           <div className="w-full flex flex-col justify-between items-center gap-10 md:flex-row">
@@ -120,8 +129,8 @@ export default function EventForm({ toggleForm, submitForm }) {
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Disponível</SelectItem>
-                <SelectItem value="sketch">Rascunho</SelectItem>
+                <SelectItem value="CONFIRMED">Disponível</SelectItem>
+                <SelectItem value="PENDING">Rascunho</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -176,9 +185,9 @@ export default function EventForm({ toggleForm, submitForm }) {
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="locally">Presencial</SelectItem>
-                <SelectItem value="hybrid">Híbrido</SelectItem>
-                <SelectItem value="online">Online</SelectItem>
+                <SelectItem value="PRESENTIAL">Presencial</SelectItem>
+                <SelectItem value="HYBRID">Híbrido</SelectItem>
+                <SelectItem value="ONLINE">Online</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -295,7 +304,7 @@ export default function EventForm({ toggleForm, submitForm }) {
               />
             </div>
           )}
-          {eventForm.type === "simple" && (
+          {eventForm.type === "SIMPLE" && (
             <>
               <div className="w-full flex flex-col justify-between items-center gap-10 sm:flex-row">
                 {(eventForm.format === "locally" ||
@@ -373,7 +382,7 @@ export default function EventForm({ toggleForm, submitForm }) {
             />
             <BannerUpload id="banner-upload" name="banner" />
           </div>
-          {eventForm.type === "simple" && (
+          {eventForm.type === "SIMPLE" && (
             <div>
               <AddInput
                 id="fields"
