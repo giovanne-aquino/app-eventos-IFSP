@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #36B325;
+  font-family: "Arial", sans-serif;
+  background-color: #36b325;
 }
 /* f8f9fa */
 .container {
@@ -11,7 +11,7 @@ body {
 }
 
 .left-side {
-  background-color: #36B325;
+  background-color: #36b325;
   color: white;
   flex: 0.9;
   display: flex;
@@ -79,13 +79,13 @@ body {
 }
 
 .form-container h2 {
-  color: #36B325;
+  color: #36b325;
   text-align: left;
   margin-bottom: 20px;
   font-size: 38px;
 }
 
-.cadastro-icon{
+.cadastro-icon {
   width: 80%;
   margin: 0px auto;
   display: block;
@@ -111,7 +111,7 @@ input {
 }
 
 input:focus {
-  border-color: #36B325;
+  border-color: #36b325;
   outline: none;
 }
 
@@ -126,7 +126,7 @@ input.error {
 
 button {
   padding: 20px;
-  background-color: #36B325;
+  background-color: #36b325;
   color: white;
   border: none;
   border-radius: 30px;
@@ -137,7 +137,7 @@ button {
 }
 
 button:hover {
-  background-color: #36B325;
+  background-color: #36b325;
 }
 
 .error-message {
@@ -155,7 +155,7 @@ form p {
 }
 
 form a {
-  color: #36B325;
+  color: #36b325;
   text-decoration: none;
 }
 
@@ -177,7 +177,7 @@ form a:hover {
     padding: 10px;
     border-radius: 0;
   }
- 
+
   .left-side {
     height: auto;
   }
@@ -187,20 +187,33 @@ form a:hover {
     padding-bottom: 20px;
   }
 
-  .left-side .top-text,
+  .left-side,
   .left-side .if-info {
     font-size: 16px;
-    text-align: center;
     margin-left: 0;
-    align-items: justify;
+  }
+
+  .left-side .top-text {
+    text-align: left;
+    align-self: flex-start;
+    justify-content: center;
   }
 
   .form-container {
     justify-content: center;
     text-align: center;
     align-items: center;
-    max-width: 100%;
+    width: 95%;
+    margin-left: 10px;
+    margin-right: 20px;
     padding: 0 10px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
 
   .cadastro-icon {
@@ -208,22 +221,53 @@ form a:hover {
     margin: 0 auto;
   }
 
+  .if-info {
+    right: 0;
+    margin: 0 auto;
+    text-align: left;
+    width: 100%;
+  }
+
+  .logo_ifsp {
+    display: block;
+    width: 25%;
+    height: auto;
+    margin-left: 0;
+    margin-right: auto;
+  }
+
   form {
     gap: 20px;
   }
 
   input,
-  button {
+  .submit {
     margin: 20px 0 auto;
     justify-content: center;
     text-align: center;
     align-items: center;
-    width: 90%;
+    width: 95%;
     font-size: 16px;
     padding: 16px;
   }
 
   p {
+    justify-content: center;
     text-align: center;
+  }
+}
+
+@media (max-width: 390px) {
+  .left-side .top-text {
+    font-size: 14px;
+  }
+
+  .cadastro-icon {
+    margin-top: 20px;
+    width: 30%;
+  }
+
+  .logo_ifsp {
+    width: 40%;
   }
 }
