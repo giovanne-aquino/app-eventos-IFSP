@@ -37,27 +37,38 @@ const desenvolvedores = [
 
 export default function Desenvolvedores() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      {/* Topo verde com subtítulo */}
-      <div className="bg-green-800 text-white rounded-2xl p-6 md:p-10 shadow-md mb-10 text-center">
-        <p className="text-sm text-gray-200 mb-1">Conheça os nossos</p>
-        <h1 className="text-3xl md:text-4xl font-bold">Desenvolvedores</h1>
-      </div>
+    <div className="min-h-screen py-12 px-4">
+      {/* Cabeçalho Verde Escuro */}
+      <section className="max-w-6xl mx-auto">
+        <div className="bg-green-800 text-white rounded-2xl py-10 px-6 shadow-md text-left">
+          <p className="text-sm text-gray-200">Conheça os nossos</p>
+          <h1 className="text-4xl font-bold">Desenvolvedores</h1>
+        </div>
 
-      {/* Galeria de desenvolvedores */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-        {desenvolvedores.map((dev, index) => (
-          <div key={index} className="bg-white shadow-md rounded-xl p-4 text-center w-full max-w-xs">
-            <img
-              src={`/images/desenvolvedores/${dev.foto}`}
-              alt={dev.nome}
-              className="w-32 h-32 object-cover rounded-full mx-auto mb-2"
-            />
-            <h3 className="font-semibold text-base">{dev.nome}</h3>
-            <p className="text-sm text-gray-500">Matrícula: {dev.matricula}</p>
-          </div>
-        ))}
-      </div>
+        <div className="max-w-4xl mx-auto px-4 py-10 space-y-16">
+          <div className="w-full h-1 bg-green-500 mb-6" />
+        </div>
+
+        {/* Grade de desenvolvedores */}
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 justify-items-center">
+          {desenvolvedores.map((dev, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all w-full max-w-[240px] text-center"
+            >
+              <img
+                src={`/images/desenvolvedores/${dev.foto}`}
+                alt={dev.nome}
+                className="rounded-t-2xl w-full h-52 object-cover object-center"
+              />
+              <div className="p-4">
+                <h3 className="text-md font-semibold text-gray-800 text-center break-words">{dev.nome}</h3>
+                <p className="text-sm text-gray-600">Matrícula: {dev.matricula}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
