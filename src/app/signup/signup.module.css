@@ -1,5 +1,6 @@
 /* signup.module.css */
 .container {
+    background-color: #36b325;
     display: flex;
     height: 100vh;
     width: 100%;
@@ -53,7 +54,7 @@
     border-top-left-radius: 100px;
     border-bottom-left-radius: 100px;
     box-shadow: -6px 0 15px rgba(0, 0, 0, 0.08);
-    height: 96%;
+    height: 100%;
     margin-top: auto;
     margin-bottom: auto;
   }
@@ -88,6 +89,21 @@
     gap: 20px;
   }
   
+  .passwordContainer {
+    position: relative;
+  }
+  
+  .togglePasswordBtn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
   .input {
     padding: 20px 24px;
     font-size: 18px;
