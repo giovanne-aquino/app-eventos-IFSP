@@ -125,27 +125,34 @@ export default function Signup() {
         <div className={styles.formContainer}>
           <h2 className={styles.formText}>Criar uma conta</h2>
           <form onSubmit={handleSubmit(onSubmit)} className={styles.formSignup}>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="Digite seu nome completo"
-              {...register("nome", { required: "Nome é obrigatório" })}
-            />
-            {errors.nome && (
-              <p className={styles.errorMessage}>{errors.nome.message}</p>
-            )}
+            <div>
+              <label className={styles.label}>Nome Completo</label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Digite seu nome completo"
+                {...register("nome", { required: "Nome é obrigatório" })}
+              />
+              {errors.nome && (
+                <p className={styles.errorMessage}>{errors.nome.message}</p>
+              )}
+            </div>
 
-            <input
-              className={styles.input}
-              type="email"
-              placeholder="Digite seu e-mail"
-              {...register("email", { required: "E-mail é obrigatório" })}
-            />
-            {errors.email && (
-              <p className={styles.errorMessage}>{errors.email.message}</p>
-            )}
+            <div>
+              <label className={styles.label}>Email</label>
+              <input
+                className={styles.input}
+                type="email"
+                placeholder="Digite seu e-mail"
+                {...register("email", { required: "E-mail é obrigatório" })}
+              />
+              {errors.email && (
+                <p className={styles.errorMessage}>{errors.email.message}</p>
+              )}
+            </div>
 
             <div className={styles.passwordContainer}>
+              <label className={styles.label}>Senha</label>
               <input
                 className={styles.input}
                 type={showPassword ? "text" : "password"}
@@ -169,6 +176,7 @@ export default function Signup() {
             )}
 
             <div className={styles.passwordContainer}>
+              <label className={styles.label}>Confirmar Senha</label>
               <input
                 className={styles.input}
                 type={showConfirmPassword ? "text" : "password"}
