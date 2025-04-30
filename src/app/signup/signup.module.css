@@ -91,6 +91,7 @@
   
   .passwordContainer {
     position: relative;
+    margin-bottom: -1rem;
   }
   
   .togglePasswordBtn {
@@ -149,10 +150,10 @@
   }
   
   .errorMessage {
+    display: block;
     color: red;
     font-size: 14px;
-    margin-top: -15px;
-    margin-bottom: -10px;
+    margin-top: 2px;
   }
   
   .formParagraph {
