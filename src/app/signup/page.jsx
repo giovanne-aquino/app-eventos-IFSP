@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { userRegisterSchema } from "../../validations/userRegister.jsx";
 import axios from "axios";
@@ -28,12 +28,9 @@ export default function Signup() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const router = useRouter();
 
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
     try {
       const { nome, email, senha } = data;
       console.log("Dados enviados para o cadastro:", {
@@ -43,7 +40,7 @@ export default function Signup() {
       });
 
       const response = await axios.post(
-        "{BACKEND_URL}/signup",
+        "http://localhost:3001/users",
         {
           name: data.nome,
           email: data.email,
@@ -56,11 +53,6 @@ export default function Signup() {
           },
         }
       );
-
-      if (response.status !== 200) {
-        const errorData = response.data;
-        throw new Error(errorData.message || "Erro no cadastro");
-      }
 
       toast.success("Cadastro realizado com sucesso!", { autoClose: 1500 });
       setTimeout(() => {
@@ -76,8 +68,6 @@ export default function Signup() {
           autoClose: 3000,
         });
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -193,9 +183,8 @@ export default function Signup() {
             <button
               type="submit"
               className={styles.submitBtn}
-              disabled={isSubmitting}
             >
-              {isSubmitting ? "Enviando..." : "Cadastrar"}
+              Cadastrar
             </button>
           </form>
           <ToastContainer />

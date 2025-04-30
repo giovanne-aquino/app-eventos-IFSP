@@ -96,7 +96,7 @@
   
   .togglePasswordBtn {
     position: absolute;
-    top: 50%;
+    top: 65%;
     right: 15px;
     transform: translateY(-50%);
     background: none;
