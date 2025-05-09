@@ -34,12 +34,12 @@ export default function Login() {
 
       console.log("Login bem-sucedido:", response.data);
     } catch (error) {
-      console.error("Erro no login:", error.response?.data || error.message);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Falha no login. Verifique suas credenciais.";
-      toast.error(errorMessage);
-    }
+        console.error("Erro no login:", error.response);
+        const errorMessage =
+          error.response?.data?.message ||
+          "Falha no login. Verifique suas credenciais.";
+        toast.error(errorMessage);
+      }
   };
 
   return (
@@ -54,6 +54,7 @@ export default function Login() {
                 type="email"
                 placeholder="Digite seu e-mail"
                 className={styles.input}
+                {...register("email", { required: "E-mail é obrigatório" })}
               />
             </div>
 
@@ -63,6 +64,7 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Digite uma senha"
                 className={styles.input}
+                {...register("password", { required: "Senha é obrigatória" })}
               />
               <button
                 type="button"
