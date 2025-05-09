@@ -10,12 +10,15 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
+    "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.487.0",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.56.1",
+    "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.1.0",
     "tailwindcss-animate": "^1.0.7"
   },
