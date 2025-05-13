@@ -1,6 +1,7 @@
 import React from "react";
 import EventoCard from "@/components/ui/eventoCard";
 
+
 const eventosMock = [
     {
         id: 1,
@@ -90,6 +91,7 @@ const EventosPage = () => {
             <h1 className="text-2xl font-bold mb-6">Eventos</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {eventosMock.map((evento) => (
+
                     <EventoCard key={evento.id} evento={evento} />
                 ))}
             </div>
