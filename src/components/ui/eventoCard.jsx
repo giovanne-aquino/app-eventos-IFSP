@@ -24,7 +24,9 @@ const EventoCard = ({ evento }) => {
 
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex flex-col text-center border border-green-700 rounded-md p-2">
-                                <h3 className="text-2xl font-bold text-green-700">{evento.startDate}</h3>
+                                <h3 className="text-xl font-bold text-green-700">
+                                    {new Date(evento.startDate).toLocaleDateString('pt-BR')}
+                                </h3>
                             </div>
                         </div>
                     </div>
