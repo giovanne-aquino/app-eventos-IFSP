@@ -1,9 +1,29 @@
 import EventoCard from "@/components/ui/eventoCard";
 import React from "react";
 
+async function getEventos() {
+    const res = await fetch("http://localhost:3001/events", {
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error("Falha ao carregar eventos");
+    }
+    const eventosJson = await res.json();
+
+    const eventos = eventosJson.map((evento) => ({
+        id: evento.id,
+        name: evento.name,
+        organizerName: evento.organizerName,
+        format: evento.format,
+        maxCapacity: evento.maxCapacity,
+        startDate: evento.startDate,
+    }));
+
+    return eventos;
+}
+
 const EventosPage = async () => {
-    const res = await fetch("http://localhost:3001/events", { cache: "no-store" });
-    const eventos = await res.json();
+    const eventos = await getEventos();
 
     return (
         <div className="container mx-auto p-4">
