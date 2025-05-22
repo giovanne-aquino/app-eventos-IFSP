@@ -2,6 +2,19 @@ import React from 'react';
 import Link from 'next/link';
 
 const EventoCard = ({ evento }) => {
+    const formatColors = {
+        PRESENTIAL: 'bg-green-500',
+        ONLINE: 'bg-blue-500',
+        HYBRID: 'bg-yellow-500',
+    }
+    const formatColorClass = formatColors[evento.format] || 'bg-gray-500';
+
+    const formatText = {
+        PRESENTIAL: 'Presencial',
+        ONLINE: 'Online',
+        HYBRID: 'Híbrido',
+    }
+
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col mb-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
             <Link href={`/gerenciar/evento/${evento.id}`}>
@@ -10,24 +23,23 @@ const EventoCard = ({ evento }) => {
                 </div>
 
                 <div className="flex-1 p-4 flex flex-col">
-                    <span className="self-end w-fit bg-yellow-500 text-white text-xs px-2 py-1 rounded-md mb-2">
-                        {evento.format}
+                    <span className={`self-end w-fit text-white text-xs px-2 py-1 rounded-md mb-2 ${formatColorClass}`}>
+                        {formatText[evento.format]}
                     </span>
 
-                    <div className="flex flex-row justify-between">
+                    <div className="flex">
+                        <h2 className="font-bold text-lg text-green-700 mb-1">{evento.name}</h2>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between">
                         <div>
-                            <h2 className="font-bold text-lg text-green-700 mb-1">{evento.name}</h2>
                             <p className="text-gray-600 text-sm">{evento.organizerName}</p>
-                            <p className="text-gray-600 text-sm">{evento.format}</p>
-                            <p className="text-gray-600 text-sm">{evento.maxCapacity} vagas</p>
+                            <p className="text-gray-600 text-sm">{evento.maxCapacity} vagas</p>    
                         </div>
 
-                        <div className="flex items-center justify-between mt-4">
-                            <div className="flex flex-col text-center border border-green-700 rounded-md p-2">
-                                <h3 className="text-xl font-bold text-green-700">
-                                    {new Date(evento.startDate).toLocaleDateString('pt-BR')}
-                                </h3>
-                            </div>
+                        <div className="text-center border border-green-700 rounded-md p-2 mt-2 sm:mt-0">
+                            <h3 className="text-xl font-bold text-green-700">
+                                {new Date(evento.startDate).toLocaleDateString('pt-BR')}
+                            </h3>
                         </div>
                     </div>
                 </div>

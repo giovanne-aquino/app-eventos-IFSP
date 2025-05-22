@@ -10,13 +10,18 @@ async function getEventos() {
     }
     const eventosJson = await res.json();
 
-    const eventos = eventosJson.map((evento) => ({
-        id: evento.id,
-        name: evento.name,
-        organizerName: evento.organizerName,
-        format: evento.format,
-        maxCapacity: evento.maxCapacity,
-        startDate: evento.startDate,
+    const eventos = await Promise.all(eventosJson.map(async (evento) => {
+        const organizerRes = await fetch(`http://localhost:3001/users/${evento.organizerId}`);
+        const organizer = await organizerRes.json();
+        
+        return {
+            id: evento.id,
+            name: evento.name,
+            organizerName: organizer.name,
+            format: evento.format,
+            maxCapacity: evento.maxCapacity,
+            startDate: evento.startDate,
+        };
     }));
 
     return eventos;
