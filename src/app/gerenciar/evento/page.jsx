@@ -39,7 +39,7 @@ const EventosPage = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     // Número de eventos por página
-    const eventsPerPage = 1;
+    const eventsPerPage = 12;
 
     const formatText = {
         PRESENTIAL: 'Presencial',
@@ -77,6 +77,7 @@ const EventosPage = () => {
             return matchesSearchTerm && matchesFormat;
         });
         setFilteredEventos(results);
+        setCurrentPage(1);
     }, [searchTerm, selectedFormat, eventos]);
 
     const indexOfLastEvent = currentPage * eventsPerPage;
@@ -86,6 +87,10 @@ const EventosPage = () => {
     const totalPages = Math.ceil(filteredEventos.length / eventsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleClearSearch = () => {
+        setSearchTerm("");
+    };
 
     const getPageNumbers = () => {
         const pageNumbers = [];
@@ -154,13 +159,24 @@ const EventosPage = () => {
             <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" />
 
             <div className="flex flex-col sm:flex-row md:justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-4">
-                <input 
-                    type="text"
-                    placeholder="Pesquise por nome ou organizador"
-                    className="w-full max-w-lg p-3 border border-gray-300 rounded-lg shadow-sm focus:outline0none focus:ring-2 focus:ring-[#36B325] focus:border-transparent" 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <div className="relative w-full max-w-lg">
+                    <input
+                        type="text"
+                        placeholder="Pesquise por nome ou organizador"
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline0none focus:ring-2 focus:ring-[#36B325] focus:border-transparent pr-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={handleClearSearch}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                            aria-label="Limpar pesquisa"
+                        >
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    )}
+                </div>
                 
                 <select 
                     id="format-select"
