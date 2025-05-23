@@ -108,7 +108,7 @@ const EventPage = () => {
 
     return (
         <div className="container mx-auto p-4 space-y-6 break-words">
-            <div className="bg-[#36B325] rounded-2xl px-5 py-10 h-40"></div>
+            <div className="bg-[#36B325] rounded-2xl px-5 py-10 h-40 md:h-64 lg:h-96"></div>
 
             <h1 className="text-xl xs:text-3xl sm:text-4xl text-center font-bold text-[#034833]">{evento.name}</h1>
 
