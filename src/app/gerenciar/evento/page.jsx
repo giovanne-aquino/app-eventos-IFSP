@@ -31,9 +31,15 @@ const EventosPage = async () => {
     const eventos = await getEventos();
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Eventos</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="container mx-auto p-4 space-y-10">
+            <div className="bg-[#36B325] text-white rounded-lg px-5 py-10">
+                <p>Confira aqui tudo referente a</p>
+                <h1 className="text-3xl font-bold">Eventos e Atividades</h1>
+            </div>
+
+            <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {eventos.map((evento) => (
                     <EventoCard key={evento.id} evento={evento} />
                 ))}
