@@ -33,6 +33,7 @@ async function getEventById(id) {
         description: evento.description,
         banner: evento.banner,
         status: evento.status,
+        category: evento.category,
     }
 }
 
@@ -92,16 +93,28 @@ const EventPage = () => {
         HYBRID: 'Híbrido',
     };
 
+    const categoryText = {
+        LECTURE: 'Palestra',
+        SHORT_COURSE: 'Curso',
+        WORKSHOP: 'Workshop',
+        SEMINAR: 'Seminário',
+    };
+
+    const statusText = {
+        PENDING: 'Pendente',
+        CONFIRMED: 'Confirmado',
+        CANCELED: 'Cancelado',
+    }
+
     return (
-        <div className="container mx-auto p-4 space-y-6">
+        <div className="container mx-auto p-4 space-y-6 break-words">
             <div className="bg-[#36B325] rounded-2xl px-5 py-10 h-40"></div>
 
             <h1 className="text-xl xs:text-3xl sm:text-4xl text-center font-bold text-[#034833]">{evento.name}</h1>
 
             <div className="flex items-center space-x-2">
-                {/* <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" /> */}
                 <div className="bg-[#034833] h-0.5 w-14 rounded-xl" />
-                <p className="text-zinc-700">{evento.format}</p>
+                <p className="text-zinc-700">{categoryText[evento.category]}</p>
             </div>
 
             <h2 className="text-lg xs:text-2xl sm:text-3xl font-bold text-[#034833]">Detalhes do evento</h2>
@@ -119,10 +132,10 @@ const EventPage = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Status:</span> {evento.status}</p>
-                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Formato:</span> {evento.format}</p>
+                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Status:</span> {statusText[evento.status]}</p>
+                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Formato:</span> {formatText[evento.format]}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Local:</span> {evento.location}</p>
-                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Data e Hora:</span> {evento.startDate}</p>
+                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Data e Hora:</span> {new Date(evento.startDate).toLocaleDateString('pt-BR')} às {new Date(evento.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Duração:</span> {evento.complementaryHours}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Capacidade:</span> {evento.maxCapacity}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Vagas:</span> --</p>
