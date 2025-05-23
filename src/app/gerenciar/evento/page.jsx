@@ -37,6 +37,10 @@ const EventosPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    // Número de eventos por página
+    const eventsPerPage = 1;
+
     const formatText = {
         PRESENTIAL: 'Presencial',
         ONLINE: 'Online',
@@ -75,6 +79,55 @@ const EventosPage = () => {
         setFilteredEventos(results);
     }, [searchTerm, selectedFormat, eventos]);
 
+    const indexOfLastEvent = currentPage * eventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+    const currentEvents = filteredEventos.slice(indexOfFirstEvent, indexOfLastEvent);
+
+    const totalPages = Math.ceil(filteredEventos.length / eventsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxPagesToShow = 5;
+
+        if (totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            pageNumbers.push(1);
+
+            let startPage = Math.max(2, currentPage - Math.floor((maxPagesToShow - 3) / 2));
+            let endPage = Math.min(totalPages - 1, currentPage + Math.ceil((maxPagesToShow - 3) / 2));
+
+            if (currentPage < maxPagesToShow - 1) {
+                endPage = maxPagesToShow - 1;
+            }
+
+            if (currentPage > totalPages - (maxPagesToShow - 2)) {
+                startPage = totalPages - (maxPagesToShow -2);
+            }
+
+            if (startPage > 2) {
+                pageNumbers.push('...');
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(i);
+            }
+
+            if (endPage < totalPages - 1) {
+                pageNumbers.push('...');
+            }
+
+            if (!pageNumbers.includes(totalPages)) {
+                pageNumbers.push(totalPages);
+            }
+        }
+        return pageNumbers;
+    }
+
     if (loading) {
         return (
             <div className="container mx-auto p-4 flex justify-center items-center h-screen">
@@ -100,7 +153,7 @@ const EventosPage = () => {
 
             <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" />
 
-            <div className="flex justify-between px-4">
+            <div className="flex flex-col sm:flex-row md:justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-4">
                 <input 
                     type="text"
                     placeholder="Pesquise por nome ou organizador"
@@ -125,18 +178,54 @@ const EventosPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* {eventos.map((evento) => (
-                    <EventoCard key={evento.id} evento={evento} />
-                ))} */}
-
-                {filteredEventos.length > 0 ? (
-                    filteredEventos.map((evento) => (
+                {currentEvents.length > 0 ? (
+                    currentEvents.map((evento) => (
                         <EventoCard key={evento.id} evento={evento} />
                     ))
                 ) : (
                     <p className="text-center text-gray-500 col-span-full">Nenhum evento encontrado para "{searchTerm}".</p>
                 )}
             </div>
+
+            {filteredEventos.length > eventsPerPage && (
+                <div className="flex flex-col sm:flex-row justify-center mt-8 space-x-2">
+                    <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-[#36B325] text-white rounded-lg disabled:opacity-50"
+                    >
+                        Anterior
+                    </button>
+
+                    <div className="flex flex-wrap justify-center space-x-2 py-2 sm:py-0">
+                        {getPageNumbers().map((number, index) => (
+                            <React.Fragment key={index}>
+                                {number === '...' ? (
+                                    <span className="px-4 py-2">...</span>
+                                ) : (
+                                    <button
+                                        onClick={() => paginate(number)}
+                                        className={`px-4 py-2 rounded-lg ${
+                                            currentPage === number ? 'bg-[#36B325] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        }`}
+                                    >
+                                        {number}
+                                    </button>
+                                )}
+                            </React.Fragment>
+                        ))}
+
+                    </div>
+
+                    <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-[#36B325] text-white rounded-lg disabled:opacity-50"
+                    >
+                        Próxima
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
