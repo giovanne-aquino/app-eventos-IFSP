@@ -14,6 +14,9 @@ async function getEventos() {
 
     const eventos = await Promise.all(eventosJson.map(async (evento) => {
         const organizerRes = await fetch(`http://localhost:3001/users/${evento.organizerId}`);
+        if (!organizerRes.ok) {
+            throw new Error("Falha ao carregar organizador");
+        }
         const organizer = await organizerRes.json();
         
         return {
@@ -151,7 +154,7 @@ const EventosPage = () => {
 
     return (
         <div className="container mx-auto p-4 space-y-10">
-            <div className="bg-[#36B325] text-white rounded-lg px-5 py-10">
+            <div className="bg-[#36B325] text-white rounded-2xl px-5 py-10">
                 <p>Confira aqui tudo referente aos seus</p>
                 <h1 className="text-3xl font-bold">Eventos</h1>
             </div>
@@ -159,7 +162,7 @@ const EventosPage = () => {
             <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" />
 
             <div className="flex flex-col sm:flex-row md:justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-4">
-            <div className="relative w-full max-w-lg">
+                <div className="relative w-full max-w-lg">
                     <input
                         type="text"
                         placeholder="Pesquise por nome ou organizador"
