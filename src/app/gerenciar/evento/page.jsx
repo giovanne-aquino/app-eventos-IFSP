@@ -1,99 +1,142 @@
 "use client";
 
 import EventoCard from "@/components/ui/eventoCard";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-async function getEventos() {
-    const res = await fetch("http://localhost:3001/events", {
-        cache: "no-store",
-    });
-    if (!res.ok) {
-        throw new Error("Falha ao carregar eventos");
+async function getEventos({
+    page,
+    pageSize,
+    format,
+    eventType,
+    searchTerm,
+}) {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", page.toString());
+    queryParams.append("pageSize", pageSize.toString());
+
+    if (format && format !== "ALL") {
+        queryParams.append("format", format);
     }
-    const eventosJson = await res.json();
 
-    const eventos = await Promise.all(eventosJson.map(async (evento) => {
-        const organizerRes = await fetch(`http://localhost:3001/users/${evento.organizerId}`);
-        if (!organizerRes.ok) {
-            throw new Error("Falha ao carregar organizador");
+    if (eventType && eventType !== "ALL") {
+        queryParams.append("eventType", eventType);
+    }
+
+    if (searchTerm) {
+        queryParams.append("searchTerm", searchTerm);
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3001/events?${queryParams.toString()}`, {
+            cache: "no-store",
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(`Falha ao carregar eventos: ${errorData.message || res.statusText}`);
         }
-        const organizer = await organizerRes.json();
-        
-        return {
-            id: evento.id,
-            name: evento.name,
-            organizerName: organizer.name,
-            format: evento.format,
-            maxCapacity: evento.maxCapacity,
-            startDate: evento.startDate,
-        };
-    }));
 
-    return eventos;
+        const { events: eventosData, total } = await res.json();
+
+        const eventosComOrganizadores = await Promise.all(
+            eventosData.map(async (evento) => {
+                try {
+                    const organizerRes = await fetch(`http://localhost:3001/users/${evento.organizerId}`);
+                    if (!organizerRes.ok) {
+                        console.warn(`Falha ao carregar organizador para o evento ${evento.id}: ${organizerRes.statusText}`);
+                        return {
+                            ...evento,
+                            organizerName: "Organizador Desconhecido",
+                        };
+                    }
+                    const organizer = await organizerRes.json();
+                    return {
+                        ...evento,
+                        organizerName: organizer.name,
+                    };
+                } catch (organizerError) {
+                    console.error(`Erro ao buscar organizador para o evento ${evento.id}:`, organizerError);
+                    return {
+                        ...evento,
+                        organizerName: "Erro ao Carregar Organizador",
+                    };
+                }
+            })
+        );
+
+        return { events: eventosComOrganizadores, total };
+    } catch (err) {
+        console.error("Erro na função getEventos:", err);
+        throw err;
+    }
 }
 
 const EventosPage = () => {
     const [eventos, setEventos] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedFormat, setSelectedFormat] = useState("ALL");
-    const [filteredEventos, setFilteredEventos] = useState([]);
+    const [selectedEventType, setSelectedEventType] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [showFilters, setShowFilters] = useState(false);
+
     const [currentPage, setCurrentPage] = useState(1);
-    // Número de eventos por página
+    const [totalEvents, setTotalEvents] = useState(0);
     const eventsPerPage = 12;
 
     const formatText = {
-        PRESENTIAL: 'Presencial',
-        ONLINE: 'Online',
-        HYBRID: 'Híbrido',
+        PRESENTIAL: "Presencial",
+        ONLINE: "Online",
+        HYBRID: "Híbrido",
     };
 
-    useEffect(() => {
-        const fetchEventos = async () => {
-            try {
-                const fetchedEventos = await getEventos();
-                setEventos(fetchedEventos);
-                setFilteredEventos(fetchedEventos);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const eventTypeText = {
+        SIMPLE: 'Simples',
+        LARGE: 'Grande',
+    };
 
+    const fetchEventos = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const { events, total } = await getEventos({
+                page: currentPage,
+                pageSize: eventsPerPage,
+                format: selectedFormat,
+                eventType: selectedEventType,
+                searchTerm: searchTerm,
+            });
+            setEventos(events);
+            setTotalEvents(total);
+        } catch (err) {
+            setError(err.message || "Ocorreu um erro ao carregar os eventos.");
+        } finally {
+            setLoading(false);
+        }
+    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, searchTerm]);
+
+    useEffect(() => {
         fetchEventos();
-    }, []);
+    }, [fetchEventos]);
 
-    useEffect(() => {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        
-        const results = eventos.filter((evento) => {
-            const matchesSearchTerm = 
-                evento.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-                evento.organizerName.toLowerCase().includes(lowerCaseSearchTerm);
+    const totalPages = Math.ceil(totalEvents / eventsPerPage);
 
-            const matchesFormat = 
-                selectedFormat === "ALL" || evento.format === selectedFormat;
-            
-            return matchesSearchTerm && matchesFormat;
-        });
-        setFilteredEventos(results);
-        setCurrentPage(1);
-    }, [searchTerm, selectedFormat, eventos]);
-
-    const indexOfLastEvent = currentPage * eventsPerPage;
-    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-    const currentEvents = filteredEventos.slice(indexOfFirstEvent, indexOfLastEvent);
-
-    const totalPages = Math.ceil(filteredEventos.length / eventsPerPage);
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
 
     const handleClearSearch = () => {
         setSearchTerm("");
     };
+
+    const toggleFilters = () => {
+        setShowFilters((prev) => !prev);
+    };
+
+    const areFiltersApplied = selectedFormat !== "ALL" || selectedEventType !== "ALL";
 
     const getPageNumbers = () => {
         const pageNumbers = [];
@@ -112,13 +155,12 @@ const EventosPage = () => {
             if (currentPage < maxPagesToShow - 1) {
                 endPage = maxPagesToShow - 1;
             }
-
             if (currentPage > totalPages - (maxPagesToShow - 2)) {
-                startPage = totalPages - (maxPagesToShow -2);
+                startPage = totalPages - (maxPagesToShow - 2);
             }
 
             if (startPage > 2) {
-                pageNumbers.push('...');
+                pageNumbers.push("...");
             }
 
             for (let i = startPage; i <= endPage; i++) {
@@ -126,7 +168,7 @@ const EventosPage = () => {
             }
 
             if (endPage < totalPages - 1) {
-                pageNumbers.push('...');
+                pageNumbers.push("...");
             }
 
             if (!pageNumbers.includes(totalPages)) {
@@ -134,7 +176,7 @@ const EventosPage = () => {
             }
         }
         return pageNumbers;
-    }
+    };
 
     if (loading) {
         return (
@@ -149,7 +191,7 @@ const EventosPage = () => {
             <div className="container mx-auto p-4 text-center text-red-600 text-xl">
                 <p>Erro ao carregar eventos: {error}</p>
             </div>
-        )
+        );
     }
 
     return (
@@ -161,52 +203,112 @@ const EventosPage = () => {
 
             <hr className="bg-[#36B325] h-1 mx-10 md:mx-20 rounded-xl" />
 
-            <div className="flex flex-col sm:flex-row md:justify-between space-y-4 sm:space-y-0 space-x-0 sm:space-x-4">
-                <div className="relative w-full max-w-lg">
+            <div className="flex flex-row justify-between items-end gap-4">
+                <div className="w-full">
+                    <label htmlFor="input-search" className="block mb-1 text-sm font-medium text-gray-700">
+                        Pesquisar
+                    </label>
+
                     <input
                         type="text"
+                        id="input-search"
                         placeholder="Pesquise por nome ou organizador"
-                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline0none focus:ring-2 focus:ring-[#36B325] focus:border-transparent pr-10"
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#36B325] focus:border-transparent pr-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+
                     {searchTerm && (
                         <button
                             onClick={handleClearSearch}
                             className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
                             aria-label="Limpar pesquisa"
                         >
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <svg
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </button>
                     )}
                 </div>
-                
-                <select 
-                    id="format-select"
-                    className="w-full sm:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#36B325] focus:border-transparent"
-                    value={selectedFormat}
-                    onChange={(e) => setSelectedFormat(e.target.value)}
+
+                <button
+                    onClick={toggleFilters}
+                    className="p-2 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#36B325] self-end mb-px sm:mb-0"
+                    aria-label={areFiltersApplied ? "Filtros aplicados" : "Mostrar filtros"}
+                    title={areFiltersApplied ? "Filtros aplicados" : "Mostrar filtros"}
                 >
-                    <option value="ALL">Todos os Formatos</option>
-                    {Object.entries(formatText).map(([key, value]) => (
-                        <option key={key} value={key}>
-                            {value}
-                        </option>
-                    ))}
-                </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" 
+                        fill={areFiltersApplied ? "#36B325" : "black"} // Cor condicional
+                    >
+                        <rect x="3" y="5" width="26" height="5" rx="2.5"/>
+                        <rect x="6" y="13" width="20" height="5" rx="2.5"/>
+                        <rect x="10" y="21" width="12" height="5" rx="2.5"/>
+                    </svg>
+                </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {currentEvents.length > 0 ? (
-                    currentEvents.map((evento) => (
-                        <EventoCard key={evento.id} evento={evento} />
-                    ))
+            {showFilters && (
+                <div className="mt-4 p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col md:flex-row justify-between gap-4">
+                    <div className="w-full">
+                        <label htmlFor="format-select" className="block mb-1 text-sm font-medium text-gray-700">
+                            Formato
+                        </label>
+
+                        <select
+                            id="format-select"
+                            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#36B325] focus:border-transparent"
+                            value={selectedFormat}
+                            onChange={(e) => {
+                                setSelectedFormat(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value="ALL">Todos os Formatos</option>
+                            {Object.entries(formatText).map(([key, value]) => (
+                                <option key={key} value={key}>
+                                {value}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="w-full">
+                        <label htmlFor="eventType-select" className="block mb-1 text-sm font-medium text-gray-700">Tipo</label>
+                        <select
+                            id="eventType-select"
+                            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#36B325] focus:border-transparent"
+                            value={selectedEventType}
+                            onChange={(e) => {
+                            setSelectedEventType(e.target.value);
+                            setCurrentPage(1);
+                            }}
+                        >
+                            <option value="ALL">Todos os Tipos</option>
+                            {Object.entries(eventTypeText).map(([key, value]) => (
+                                <option key={key} value={key}>
+                                {value}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {eventos.length > 0 ? (
+                    eventos.map((evento) => <EventoCard key={evento.id} evento={evento} />)
                 ) : (
-                    <p className="text-center text-gray-500 col-span-full">Nenhum evento encontrado para "{searchTerm}".</p>
+                    <p className="text-center text-gray-500 col-span-full">Nenhum evento encontrado.</p>
                 )}
             </div>
 
-            {filteredEventos.length > eventsPerPage && (
+            {totalEvents > eventsPerPage && (
                 <div className="flex flex-col sm:flex-row justify-center mt-8 space-x-2">
                     <button
                         onClick={() => paginate(currentPage - 1)}
@@ -219,13 +321,15 @@ const EventosPage = () => {
                     <div className="flex flex-wrap justify-center space-x-2 py-2 sm:py-0">
                         {getPageNumbers().map((number, index) => (
                             <React.Fragment key={index}>
-                                {number === '...' ? (
+                                {number === "..." ? (
                                     <span className="px-4 py-2">...</span>
                                 ) : (
                                     <button
                                         onClick={() => paginate(number)}
                                         className={`px-4 py-2 rounded-lg ${
-                                            currentPage === number ? 'bg-[#36B325] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        currentPage === number
+                                            ? "bg-[#36B325] text-white"
+                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
                                     >
                                         {number}
@@ -233,7 +337,6 @@ const EventosPage = () => {
                                 )}
                             </React.Fragment>
                         ))}
-
                     </div>
 
                     <button

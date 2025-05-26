@@ -134,9 +134,16 @@ const EventPage = () => {
             <div className="flex flex-col gap-2">
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Status:</span> {statusText[evento.status]}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Formato:</span> {formatText[evento.format]}</p>
-                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Local:</span> {evento.location}</p>
+
+                {evento.format !== 'ONLINE' && (
+                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Local:</span> {evento.location}</p>
+                )}
+
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Data e Hora:</span> {new Date(evento.startDate).toLocaleDateString('pt-BR')} às {new Date(evento.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Duração:</span> {evento.complementaryHours}</p>
+                <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Duração: </span>
+                    {evento.complementaryHours}
+                    { evento.complementaryHours > 1 ? ' horas' : ' hora'}
+                </p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Capacidade:</span> {evento.maxCapacity}</p>
                 <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Vagas:</span> --</p>
             </div>
@@ -144,29 +151,6 @@ const EventPage = () => {
             <h3 className="text-md xs:text-xl sm:text-2xl font-semibold text-[#034833]">Descrição</h3>
 
             <p className="text-zinc-700 text-justify">{evento.description}</p>
-
-            {/* <p className="text-gray-700 text-lg">**Organizador:** {evento.organizerName}</p>
-            <p className="text-gray-700 text-lg">**Formato:** {formatText[evento.format]}</p>
-            <p className="text-gray-700 text-lg">**Início:** {new Date(evento.startDate).toLocaleDateString('pt-BR')} às {new Date(evento.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-            {evento.endDate && (
-                <p className="text-gray-700 text-lg">**Término:** {new Date(evento.endDate).toLocaleDateString('pt-BR')} às {new Date(evento.endDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-            )}
-            {evento.location && (
-                <p className="text-gray-700 text-lg">**Local:** {evento.location}</p>
-            )}
-            {evento.maxCapacity && (
-                <p className="text-gray-700 text-lg">**Capacidade Máxima:** {evento.maxCapacity} vagas</p>
-            )}
-            {evento.complementaryHours && (
-                <p className="text-gray-700 text-lg">**Horas Complementares:** {evento.complementaryHours}</p>
-            )}
-            <p className="text-gray-800 leading-relaxed mt-4 text-justify">{evento.description}</p>
-
-            {evento.banner && (
-                <div className="mt-8">
-                    <img src={evento.banner} alt={`Banner do evento ${evento.name}`} className="w-full h-auto rounded-lg shadow-md" />
-                </div>
-            )} */}
         </div>
     );
 };

@@ -30,13 +30,13 @@ const EventoCard = ({ evento }) => {
                     <div className="flex">
                         <h2 className="font-bold text-lg text-[#36B325] mb-1">{evento.name}</h2>
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-between">
+                    <div className="flex flex-col md:flex-row justify-between gap-2">
                         <div>
                             <p className="text-gray-600 text-sm">{evento.organizerName}</p>
                             <p className="text-gray-600 text-sm">{evento.maxCapacity} vagas</p>    
                         </div>
 
-                        <div className="text-center border border-[#36B325] rounded-md p-2 mt-2 sm:mt-0">
+                        <div className="text-center border border-[#36B325] rounded-md p-2">
                             <h3 className="text-xl font-bold text-[#36B325]">
                                 {new Date(evento.startDate).toLocaleDateString('pt-BR')}
                             </h3>
