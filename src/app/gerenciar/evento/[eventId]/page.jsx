@@ -94,10 +94,12 @@ const EventPage = () => {
     };
 
     const categoryText = {
+        TALK: 'Palestra',
         LECTURE: 'Palestra',
-        SHORT_COURSE: 'Curso',
         WORKSHOP: 'Workshop',
         SEMINAR: 'Seminário',
+        SHORT_COURSE: 'Curso',
+        OTHER: 'Outro',
     };
 
     const statusText = {
