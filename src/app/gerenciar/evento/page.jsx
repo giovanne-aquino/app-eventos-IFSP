@@ -130,7 +130,7 @@ const EventosPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, searchTerm, selectedCategory]);
+    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, selectedCategory, searchTerm]);
 
     useEffect(() => {
         fetchEventos();
