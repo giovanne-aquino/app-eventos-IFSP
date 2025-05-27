@@ -9,6 +9,7 @@ async function getEventos({
     format,
     eventType,
     searchTerm,
+    category
 }) {
     const queryParams = new URLSearchParams();
     queryParams.append("page", page.toString());
@@ -22,12 +23,16 @@ async function getEventos({
         queryParams.append("eventType", eventType);
     }
 
+    if (category && category !== "ALL") {
+        queryParams.append("category", category);
+    }
+
     if (searchTerm) {
         queryParams.append("searchTerm", searchTerm);
     }
 
     try {
-        const res = await fetch(`http://localhost:3001/events?${queryParams.toString()}`, {
+        const res = await fetch(`http://localhost:3001/events/manage?${queryParams.toString()}`, {
             cache: "no-store",
         });
 
@@ -76,6 +81,7 @@ const EventosPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedFormat, setSelectedFormat] = useState("ALL");
     const [selectedEventType, setSelectedEventType] = useState("ALL");
+    const [selectedCategory, setSelectedCategory] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -96,6 +102,15 @@ const EventosPage = () => {
         LARGE: 'Grande',
     };
 
+    const categoryText = {
+        TALK: 'Conversa',
+        LECTURE: 'Palestra',
+        WORKSHOP: 'Workshop',
+        SEMINAR: 'Seminário',
+        SHORT_COURSE: 'Curso Curto',
+        OTHER: 'Outro'
+    }
+
     const fetchEventos = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -105,6 +120,7 @@ const EventosPage = () => {
                 pageSize: eventsPerPage,
                 format: selectedFormat,
                 eventType: selectedEventType,
+                category: selectedCategory,
                 searchTerm: searchTerm,
             });
             setEventos(events);
@@ -114,7 +130,7 @@ const EventosPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, searchTerm]);
+    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, searchTerm, selectedCategory]);
 
     useEffect(() => {
         fetchEventos();
@@ -136,7 +152,7 @@ const EventosPage = () => {
         setShowFilters((prev) => !prev);
     };
 
-    const areFiltersApplied = selectedFormat !== "ALL" || selectedEventType !== "ALL";
+    const areFiltersApplied = selectedFormat !== "ALL" || selectedEventType !== "ALL" || selectedCategory !== "ALL";
 
     const getPageNumbers = () => {
         const pageNumbers = [];
@@ -293,6 +309,27 @@ const EventosPage = () => {
                             {Object.entries(eventTypeText).map(([key, value]) => (
                                 <option key={key} value={key}>
                                 {value}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="w-full">
+                        <label htmlFor="category-select" className="block mb-1 text-sm font-medium text-gray-700">Categoria</label>
+
+                        <select
+                            id="category-select"
+                            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#36B325] focus:border-transparent"
+                            value={selectedCategory}
+                            onChange={(e) => {
+                                setSelectedCategory(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value="ALL">Todas as Categorias</option>
+                            {Object.entries(categoryText).map(([key, value]) => (
+                                <option key={key} value={key}>
+                                    {value}
                                 </option>
                             ))}
                         </select>
