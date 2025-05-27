@@ -82,7 +82,8 @@ const EventosPage = () => {
     const [selectedFormat, setSelectedFormat] = useState("ALL");
     const [selectedEventType, setSelectedEventType] = useState("ALL");
     const [selectedCategory, setSelectedCategory] = useState("ALL");
-    const [loading, setLoading] = useState(true);
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const [showFilters, setShowFilters] = useState(false);
@@ -112,7 +113,7 @@ const EventosPage = () => {
     }
 
     const fetchEventos = useCallback(async () => {
-        setLoading(true);
+        //setLoading(true);
         setError(null);
         try {
             const { events, total } = await getEventos({
@@ -121,20 +122,31 @@ const EventosPage = () => {
                 format: selectedFormat,
                 eventType: selectedEventType,
                 category: selectedCategory,
-                searchTerm: searchTerm,
+                searchTerm: debouncedSearchTerm,
             });
             setEventos(events);
             setTotalEvents(total);
         } catch (err) {
             setError(err.message || "Ocorreu um erro ao carregar os eventos.");
-        } finally {
-            setLoading(false);
-        }
-    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, selectedCategory, searchTerm]);
+        } 
+        // finally {
+        //     setLoading(false);
+        // }
+    }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, selectedCategory, debouncedSearchTerm]);
 
     useEffect(() => {
         fetchEventos();
     }, [fetchEventos]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchTerm]);
 
     const totalPages = Math.ceil(totalEvents / eventsPerPage);
 

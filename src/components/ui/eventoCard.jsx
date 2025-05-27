@@ -17,7 +17,7 @@ const EventoCard = ({ evento }) => {
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col mb-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-            <Link href={`/gerenciar/evento/${evento.id}`}>
+            <Link href={`/${evento.id}`}>
                 <div className="bg-gray-300 w-full h-48 relative">
                     {/* Espaço reservado para imagem */}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useParams } from "next/navigation"; // Correct import for useParams
+import { useParams } from "next/navigation";
 
 async function getEventById(id) {
     const res = await fetch(`http://localhost:3001/events/${id}`, {
@@ -17,8 +17,6 @@ async function getEventById(id) {
         throw new Error("Falha ao carregar organizador");
     }
     const organizer = await organizerRes.json();
-
-    console.log(evento);
 
     return {
         id: evento.id,
