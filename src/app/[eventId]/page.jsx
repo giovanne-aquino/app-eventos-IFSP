@@ -35,6 +35,17 @@ async function getEventById(id) {
     }
 }
 
+async function getActivityByEventId(eventId) {
+    const res = await fetch(`http://localhost:3001/activities/event/${eventId}`, {
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        throw new Error("Falha ao carregar atividades do evento");
+    }
+    return res.json();
+}
+
 const EventPage = () => {
     const params = useParams();
     const id = params.eventId;
@@ -49,6 +60,7 @@ const EventPage = () => {
                 try {
                     setLoading(true);
                     const fetchedEvento = await getEventById(id);
+                    const activities = await getActivityByEventId(id);
                     setEvento(fetchedEvento);
                 } catch (err) {
                     setError(err.message);
