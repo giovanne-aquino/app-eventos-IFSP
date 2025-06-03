@@ -113,9 +113,9 @@ const EventosPage = () => {
     }
 
     const fetchEventos = useCallback(async () => {
-        //setLoading(true);
-        setError(null);
         try {
+            setLoading(true);
+            setError(null);
             const { events, total } = await getEventos({
                 page: currentPage,
                 pageSize: eventsPerPage,
@@ -129,9 +129,9 @@ const EventosPage = () => {
         } catch (err) {
             setError(err.message || "Ocorreu um erro ao carregar os eventos.");
         } 
-        // finally {
-        //     setLoading(false);
-        // }
+        finally {
+            setLoading(false);
+        }
     }, [currentPage, eventsPerPage, selectedFormat, selectedEventType, selectedCategory, debouncedSearchTerm]);
 
     useEffect(() => {
