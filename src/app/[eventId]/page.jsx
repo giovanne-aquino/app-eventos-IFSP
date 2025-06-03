@@ -35,8 +35,8 @@ async function getEventById(id) {
     }
 }
 
-async function getActivityByEventId(eventId) {
-    const res = await fetch(`http://localhost:3001/activities/event/${eventId}`, {
+async function getActivityByEventId(eventId, page = 1, pageSize = 6) {
+    const res = await fetch(`http://localhost:3001/activities/event/${eventId}?page=${page}&&pageSize=${pageSize}`, {
         cache: "no-store",
     });
 
@@ -46,38 +46,126 @@ async function getActivityByEventId(eventId) {
     return res.json();
 }
 
+function truncateWords(text, limit) {
+    if (!text) {
+        return '';
+    }
+    const words = text.split(' ');
+    if (words.length > limit) {
+        return words.slice(0, limit).join(' ') + '...';
+    }
+    return text;
+}
+
+// Sua função getPageNumbers (mantida como você forneceu)
+const getPageNumbers = (currentPage, totalPages, pageNeighbours = 1) => {
+    const totalNumbers = pageNeighbours * 2 + 3;
+    const totalBlocks = totalNumbers + 2;
+
+    if (totalPages <= totalBlocks) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const page = []; // Nome da variável como no seu código
+    const startpage = Math.max(2, currentPage - pageNeighbours); // Nome da variável como no seu código
+    const endPage = Math.min(totalPages - 1, currentPage + pageNeighbours);
+
+    page.push(1);
+
+    if (startpage > 2) {
+        page.push('...');
+    }
+
+    for (let i = startpage; i <= endPage; i++) {
+        page.push(i);
+    }
+
+    if (endPage < totalPages - 1) {
+        page.push('...');
+    }
+
+    page.push(totalPages);
+
+    return page;
+}
+
 const EventPage = () => {
     const params = useParams();
     const id = params.eventId;
 
     const [evento, setEvento] = React.useState(null);
     const [atividades, setAtividades] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
+    
+    const [loadingEvento, setLoadingEvento] = React.useState(true);
+    const [loadingActivities, setLoadingActivities] = React.useState(true);
     const [error, setError] = React.useState(null);
+
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [pageSize, setPageSize] = React.useState(6); // Mantido, embora não usado diretamente em getPageNumbers, é usado para calcular totalPages
+    const [totalActivities, setTotalActivities] = React.useState(0);
 
     useEffect(() => {
         if (id) {
-            const fetchEventDetails = async () => {
-                try {
-                    setLoading(true);
-                    const fetchedEvento = await getEventById(id);
-                    const fetchedAtividades = await getActivityByEventId(id);
+            setLoadingEvento(true);
+            setError(null);
+
+            getEventById(id)
+                .then(fetchedEvento => {
                     setEvento(fetchedEvento);
-                    setAtividades(fetchedAtividades);
-                } catch (err) {
+                })
+                .catch(err => {
                     setError(err.message);
                     setEvento(null);
-                    setAtividades([]);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            fetchEventDetails();
+                })
+                .finally(() => {
+                    setLoadingEvento(false);
+                });
         }
     }, [id]);
 
-    if (loading) {
+    useEffect(() => {
+        if (id) {
+            setLoadingActivities(true);
+
+            getActivityByEventId(id, currentPage, pageSize)
+                .then(data => {
+                    setAtividades(data.activities);
+                    setTotalActivities(data.total);
+                })
+                .catch(err => {
+                    console.error("Falha ao carregar atividades: ", err.message);
+                    setError("Falha ao carregar atividades: " + err.message);
+                    setAtividades([]);
+                    setTotalActivities(0);
+                })
+                .finally(() => {
+                    setLoadingActivities(false);
+                })
+        }
+    }, [id, currentPage, pageSize]);
+
+    const totalPages = Math.ceil(totalActivities / pageSize);
+
+    const handlePreviousPage = () => {
+        setCurrentPage(prevPage => Math.max(prevPage - 1, 1));
+    }
+
+    const handleNextPage = () => {
+        setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages));
+    }
+
+    // ****** INÍCIO DAS ALTERAÇÕES NA PAGINAÇÃO ******
+    const paginate = (pageNumber) => {
+        // Verifica se pageNumber é realmente um número antes de atualizar o estado,
+        // para evitar problemas caso '...' seja clicado (embora não deva ser clicável como botão)
+        if (typeof pageNumber === 'number') {
+            setCurrentPage(pageNumber);
+        }
+    };
+    // ****** FIM DAS ALTERAÇÕES NA PAGINAÇÃO ******
+
+
+    if (loadingEvento) {
         return (
             <div className="container mx-auto p-4 flex justify-center items-center h-screen">
                 <p className="text-xl text-gray-700">Carregando detalhes do evento...</p>
@@ -85,7 +173,7 @@ const EventPage = () => {
         );
     }
 
-    if (error) {
+    if (error && !evento) {
         return (
             <div className="container mx-auto p-4 text-center text-red-600 text-xl">
                 <p>Erro ao carregar os detalhes do evento: {error}</p>
@@ -106,8 +194,6 @@ const EventPage = () => {
         ONLINE: 'bg-blue-500',
         HYBRID: 'bg-yellow-500',
     }
-
-    const formatColorClass = formatColors[evento.format] || 'bg-gray-500';
 
     const formatText = {
         PRESENTIAL: 'Presencial',
@@ -131,7 +217,7 @@ const EventPage = () => {
     }
 
     return (
-        <div className="container mx-auto p-4 space-y-6 break-words">
+        <div className="container mx-auto p-4 space-y-10 break-words">
             <div className="bg-[#36B325] rounded-2xl px-5 py-10 h-40 md:h-64 lg:h-96"></div>
 
             <h1 className="text-xl xs:text-3xl sm:text-4xl text-center font-bold text-[#034833]">{evento.name}</h1>
@@ -143,104 +229,128 @@ const EventPage = () => {
 
             <h2 className="text-lg xs:text-2xl sm:text-3xl font-bold text-[#034833]">Detalhes do evento</h2>
 
-            <div className="flex flex-wrap gap-2">
-                <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg m">
-                    tag 1
+            <div className="flex flex-col gap-5">
+                <div className="flex flex-wrap gap-2">
+                    <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg m">
+                        tag 1
+                    </div>
+                    <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg">
+                        tag 1
+                    </div>
+                    <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg">
+                        tag 1
+                    </div>
                 </div>
-                <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg">
-                    tag 1
-                </div>
-                <div className="px-4 py-2 bg-[#36B325] text-white rounded-lg">
-                    tag 1
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-col gap-2 w-full">
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Status:</span> {statusText[evento.status]}</p>
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Formato:</span> {formatText[evento.format]}</p>
+
+                        {evento.format !== 'ONLINE' && (
+                            <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Local:</span> {evento.location}</p>
+                        )}
+
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Data e Hora:</span> {new Date(evento.startDate).toLocaleDateString('pt-BR')} às {new Date(evento.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-2 w-full">
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Duração: </span>
+                            {evento.complementaryHours}
+                            { evento.complementaryHours > 1 ? ' horas' : ' hora'}
+                        </p>
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Capacidade:</span> {evento.maxCapacity}</p>
+                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Vagas:</span> --</p> 
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-                <div className="flex flex-col gap-2 w-full">
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Status:</span> {statusText[evento.status]}</p>
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Formato:</span> {formatText[evento.format]}</p>
-
-                    {evento.format !== 'ONLINE' && (
-                        <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Local:</span> {evento.location}</p>
-                    )}
-
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Data e Hora:</span> {new Date(evento.startDate).toLocaleDateString('pt-BR')} às {new Date(evento.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 w-full">
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Duração: </span>
-                        {evento.complementaryHours}
-                        { evento.complementaryHours > 1 ? ' horas' : ' hora'}
-                    </p>
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Capacidade:</span> {evento.maxCapacity}</p>
-                    <p className="text-zinc-700"><span className="font-semibold text-zinc-900">Vagas:</span> --</p> 
-                </div>
+            <div className="flex flex-col gap-2">
+                <h3 className="text-md xs:text-xl sm:text-2xl font-semibold text-[#034833]">Descrição</h3>
+                <p className="text-zinc-700 text-justify">{evento.description}</p>
             </div>
 
-            <h3 className="text-md xs:text-xl sm:text-2xl font-semibold text-[#034833]">Descrição</h3>
+            {loadingActivities ? (
+                <p className="text-zinc-700 text-center py-4">Carregando atividades...</p>
+            ) : atividades && atividades.length > 0 ? (
+                <div className="flex flex-col">
+                    <h3 className="text-md xs:text-xl sm:text-2xl font-semibold text-[#034833] mt-8 mb-4">Atividades do Evento</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {atividades.map(activity => (
+                            <div key={activity.id || activity.name} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-lg gap-2">                            
+                                <div className="w-full relative">
+                                    <span className={`absolute top-0 right-0 text-white text-xs px-2 py-1 rounded-tr-md rounded-bl-md ${formatColors[activity.format] || 'bg-gray-500'}`}>{formatText[activity.format]}</span>
+                                </div>
 
-            <p className="text-zinc-700 text-justify">{evento.description}</p>
+                                <div className="flex-1 p-4 flex flex-col justify-between gap-2">
+                                    <div>
+                                        <h2 className="font-bold text-lg text-[#36B325]" title={activity.name}>{activity.name}</h2>
+                                    </div>
 
-            <h3 className="text-md xs:text-xl sm:text-2xl font-semibold text-[#034833] mt-8 mb-4">Atividades do Evento</h3>
+                                    <div>                                   
+                                        <h3>
+                                            {new Date(activity.startDate).toLocaleDateString('pt-BR', { year: '2-digit', month: '2-digit', day: '2-digit' })} ás {new Date(activity.startDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                        </h3>
+                                    </div>
 
-             {/* {atividades && atividades.length > 0 ? (
-                <div className="space-y-4">
-                    {atividades.map(activity => (
-                        <div key={activity.id || activity.name} className="bg-white p-4 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
-                            <h4 className="text-lg font-semibold text-[#36B325]">{activity.name}</h4>
-                            {activity.description && <p className="text-sm text-zinc-700 mt-1 whitespace-pre-line">{activity.description}</p>}
-                            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm text-zinc-600">
-                                {activity.startTime && (
-                                    <p>
-                                        <strong><i className="far fa-clock mr-1"></i>Horário:</strong> {new Date(activity.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                        {activity.endTime && ` - ${new Date(activity.endTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`}
-                                    </p>
-                                )}
-                                {activity.speaker && <p><strong><i className="fas fa-user-tie mr-1"></i>Palestrante:</strong> {activity.speaker}</p>}
-                                {activity.location && <p><strong><i className="fas fa-map-marker-alt mr-1"></i>Local:</strong> {activity.location}</p>}
-                                {activity.format && formatText[activity.format] && <p><strong><i className="fas fa-tag mr-1"></i>Formato:</strong> {formatText[activity.format]}</p>}
+                                    <div className="text-gray-600 text-sm">
+                                        {truncateWords(activity.description, 15)}   
+                                    </div>
+                                </div>
                             </div>
+                        ))}
+                    </div>
+
+                    {totalPages > 1 && (
+                        <div className="flex flex-col sm:flex-row justify-center mt-8 space-x-2"> {/* Mantive space-x-2 para o container principal dos botões */}
+                            <button
+                                onClick={handlePreviousPage}
+                                disabled={currentPage === 1 || loadingActivities}
+                                className="px-4 py-2 bg-[#36B325] text-white rounded-lg disabled:opacity-50"
+                            >
+                                Anterior
+                            </button>
+
+                            {/* ****** INÍCIO DAS ALTERAÇÕES NA PAGINAÇÃO ****** */}
+                            <div className="flex flex-wrap justify-center space-x-2 py-2 sm:py-0">
+                                {/* Chamada corrigida para getPageNumbers, passando os argumentos necessários */}
+                                {getPageNumbers(currentPage, totalPages).map((number, index) => (
+                                    <React.Fragment key={index}>
+                                        {number === "..." ? (
+                                            <span className="px-4 py-2">...</span>
+                                        ) : (
+                                            <button
+                                                // onClick corrigido para chamar a função paginate definida
+                                                onClick={() => paginate(number)}
+                                                className={`px-4 py-2 rounded-lg ${
+                                                currentPage === number
+                                                    ? "bg-[#36B325] text-white" // Estilo mantido como no seu código
+                                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300" // Estilo mantido
+                                                }`}
+                                                disabled={loadingActivities} // Adicionado para desabilitar durante o carregamento
+                                            >
+                                                {number}
+                                            </button>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                            {/* ****** FIM DAS ALTERAÇÕES NA PAGINAÇÃO ****** */}
+
+                            <button
+                                onClick={handleNextPage}
+                                disabled={currentPage === totalPages || loadingActivities}
+                                className="px-4 py-2 bg-[#36B325] text-white rounded-lg disabled:opacity-50"
+                            >
+                                Próxima
+                            </button>
                         </div>
-                    ))}
+                    )}
                 </div>
             ) : (
-                <p className="text-zinc-700">Nenhuma atividade programada para este evento no momento.</p>
-            )} */}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {atividades && atividades.length > 0 ? (
-                    atividades.map(activity => (
-                            <div key={activity.id || activity.name} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col mb-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-                                <div className="bg-gray-300 w-full h-48 relative">
-                                    <span className={`absolute bottom-0 left-0 text-white text-xs px-2 rounded-tr-md ${formatColorClass}`}>
-                                        {formatText[activity.format]}
-                                    </span>
-                                </div>
-
-                                <div className="flex-1 p-4 flex flex-col justify-between">
-                                    <div className="flex">
-                                        <h2 className="font-bold text-lg text-[#36B325] mb-1">{activity.name}</h2>
-                                    </div>
-                                    <div className="flex flex-col md:flex-row justify-between gap-2">
-                                        <div className="text-gray-600 text-sm">
-                                            <p>{activity.maxCapacity} vagas</p>
-                                            <p>{new Date(activity.startDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-                                        </div>
-
-                                        <div className="flex items-center text-center border border-[#36B325] rounded-md p-2">
-                                            <h3 className="text-xl font-bold text-[#36B325">
-                                                {new Date(activity.startDate).toLocaleDateString('pt-BR', {month: '2-digit', day: '2-digit'})}
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                    ))
-                ) : (
-                    <p className="text-zinc-700">Nenhuma atividade programada para este evento no momento.</p>
-                )}
-            </div>
+                 <p className="text-zinc-700 text-center py-4">Nenhuma atividade programada para este evento no momento.</p>
+            )}
         </div>
     );
 };
